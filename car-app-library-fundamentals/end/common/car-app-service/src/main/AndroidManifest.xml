@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright 2023 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--
+        This AndroidManifest.xml will contain all of the elements that should be shared across the
+        Android Auto and Automotive OS versions of the app, such as the CarAppService <service> element
+    -->
+
+    <!--
+        This permission is required to use the `PlaceListMapTemplate` and should only be declared
+        by apps declaring the `androidx.car.app.category.POI` category
+    -->
+    <uses-permission android:name="androidx.car.app.MAP_TEMPLATES" />
+
+    <application>
+        <!--
+            Since this app does not use any features from beyond API level 1, it makes the most sense
+            to use that as the `minCarApiLevel`. Even if it did use features from higher API levels,
+            it could still use this value as long as those features are only used behind a runtime check
+        -->
+        <meta-data
+            android:name="androidx.car.app.minCarApiLevel"
+            android:value="1" />
+
+        <service
+            android:name="com.example.places.carappservice.PlacesCarAppService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="androidx.car.app.CarAppService" />
+                <category android:name="androidx.car.app.category.POI" />
+            </intent-filter>
+        </service>
+    </application>
+</manifest>
