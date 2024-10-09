@@ -16,6 +16,15 @@
 
 package com.example.places
 
+/*
+try05 : https://developer.android.com/codelabs/car-app-library-fundamentals 와 https://thinking-face.tistory.com/383
+Could not find androidx.compose.ui:ui-test-junit4:.
+Required by:
+project :app
+처음 구동 한번은 됐음.
+에서 제공하는 car-app-library-fundamentals/start 폴더의 Project를 Rebuild하는데 Grale Sync issues에서 계속 위 에러가 발생하고 있는데, 해결 방법을 알려줘
+*/
+
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
