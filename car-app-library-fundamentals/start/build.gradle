@@ -17,6 +17,7 @@
 buildscript {
     ext {
         compose_bom = '2023.04.01'
+        compose_version = '1.4.2'   //try05
     }
 }
 
