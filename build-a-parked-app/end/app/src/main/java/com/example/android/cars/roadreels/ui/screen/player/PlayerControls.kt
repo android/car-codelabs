@@ -51,15 +51,14 @@ import com.example.android.cars.roadreels.R
 
 @Composable
 fun PlayerControls(
-    visible: Boolean,
-    playerState: PlayerState,
+    uiState: PlayerUiState,
     onClose: () -> Unit,
     onPlayPause: () -> Unit,
     onSeek: (seekToMillis: Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     AnimatedVisibility(
-        visible = visible,
+        visible = uiState.isShowingControls,
         enter = fadeIn(),
         exit = fadeOut()
     ) {
@@ -69,14 +68,14 @@ fun PlayerControls(
                     .fillMaxWidth()
                     .padding(dimensionResource(R.dimen.screen_edge_padding))
                     .align(Alignment.TopCenter),
-                title = playerState.mediaMetadata.title?.toString(),
+                title = uiState.mediaMetadata.title?.toString(),
                 onClose = onClose
             )
 
             CenterControls(
                 modifier = Modifier
                     .align(Alignment.Center),
-                isPlaying = playerState.isPlaying,
+                isPlaying = uiState.isPlaying,
                 onPlayPause = onPlayPause
             )
 
@@ -85,8 +84,8 @@ fun PlayerControls(
                     .fillMaxWidth()
                     .padding(dimensionResource(R.dimen.screen_edge_padding))
                     .align(Alignment.BottomCenter),
-                durationMillis = playerState.durationMillis,
-                currentPositionMillis = playerState.currentPositionMillis,
+                durationMillis = uiState.durationMillis,
+                currentPositionMillis = uiState.currentPositionMillis,
                 onSeek = onSeek
             )
         }

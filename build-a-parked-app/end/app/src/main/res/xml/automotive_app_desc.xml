@@ -15,8 +15,7 @@
  limitations under the License.
 -->
 
-<automotiveApp xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<automotiveApp xmlns:tools="http://schemas.android.com/tools">
     <uses
         name="video"
         tools:ignore="InvalidUsesTagAttribute" />
