@@ -16,8 +16,8 @@
 
 package com.example.android.cars.roadreels.ui.screen.player
 
-import android.app.Activity
 import android.content.pm.ActivityInfo
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -29,153 +29,79 @@ import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
-import androidx.media3.common.MediaItem
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.session.MediaSession
+import androidx.media3.common.util.UnstableApi
 import com.example.android.cars.roadreels.LocalControllableInsets
 import com.example.android.cars.roadreels.SupportedOrientation
 import com.example.android.cars.roadreels.supportedOrientations
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
-const val VIDEO_URI =
-    "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-
-data class PlayerState(
+data class PlayerUiState(
+    val isShowingControls: Boolean = false,
     val isLoading: Boolean = true,
     val isPlaying: Boolean = false,
-    val durationMillis: Long,
-    val currentPositionMillis: Long,
-    val mediaMetadata: MediaMetadata
-)
-
-fun Player.toPlayerState(): PlayerState {
-    return PlayerState(
-        isLoading,
-        isPlaying,
-        duration,
-        currentPosition,
-        mediaMetadata,
-    )
+    val durationMillis: Long = -1,
+    val currentPositionMillis: Long = -1,
+    val mediaMetadata: MediaMetadata = MediaMetadata.Builder().build()
+) {
+    fun withPlayerState(player: Player): PlayerUiState {
+        return copy(
+            isLoading = player.isLoading,
+            isPlaying = player.isPlaying,
+            durationMillis = player.duration,
+            currentPositionMillis = player.currentPosition,
+            mediaMetadata = player.mediaMetadata
+        )
+    }
 }
 
+@UnstableApi
 @Composable
 fun PlayerScreen(
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: PlayerViewModel = viewModel()
 ) {
-    val context = LocalContext.current as Activity
-    val coroutineScope = rememberCoroutineScope()
+    val activity = checkNotNull(LocalActivity.current)
+    val windowInsetsController =
+        WindowCompat.getInsetsController(
+            activity.window,
+            activity.window.decorView
+        )
 
-    val player = remember(context) { ExoPlayer.Builder(context).build() }
-    var isShowingControls by remember { mutableStateOf(true) }
-    var playerState by remember(player) { mutableStateOf(player.toPlayerState()) }
+    val player by viewModel.player.collectAsState()
+    val playerUiState by viewModel.uiState.collectAsState()
 
-    DisposableEffect(player) {
-        val listener = object : Player.Listener {
-            override fun onEvents(player: Player, events: Player.Events) {
-                super.onEvents(player, events)
+    val controllableInsetsTypeMask by rememberUpdatedState(LocalControllableInsets.current)
 
-                if (events.contains(Player.EVENT_MEDIA_METADATA_CHANGED)
-                    || events.contains(Player.EVENT_IS_LOADING_CHANGED)
-                    || events.contains(Player.EVENT_IS_PLAYING_CHANGED)
-                ) {
-                    playerState = player.toPlayerState()
-                }
-            }
-        }
-
-        player.addListener(listener)
-
-        onDispose {
-            player.removeListener(listener)
-            player.release()
-        }
-    }
-
-    // Continually update to capture the current position
-    LaunchedEffect(player) {
-        while (true) {
-            playerState = player.toPlayerState()
-            delay(1000)
-        }
-    }
-
-    val mediaSession = remember(context, player) { MediaSession.Builder(context, player).build() }
-
-    val mediaSource =
-        MediaItem.fromUri(VIDEO_URI)
-            .buildUpon().setMediaMetadata(
-                MediaMetadata.Builder()
-                    .setTitle("Big Buck Bunny")
-                    .setArtworkUri("https://peach.blender.org/wp-content/uploads/title_anouncement.jpg".toUri())
-                    .build()
-            ).build()
-
-    // When either the player or the mediaSource change, react to that change
-    LaunchedEffect(player, mediaSource) {
-        player.setMediaItem(mediaSource)
-        player.prepare()
-        player.playWhenReady = true
-    }
-
-    val windowInsetsController = remember(context) { WindowCompat.getInsetsController(context.window, context.window.decorView) }
-
-    val controllableInsetsTypeMask = LocalControllableInsets.current
-
-    LaunchedEffect(Unit) {
+    DisposableEffect(Unit) {
         // Only automatically set the orientation to landscape if the device supports landscape.
         // On devices that are portrait only, the activity may enter a compat mode and won't get to
         // use the full window available if so. The same applies if the app's window is portrait
         // in multi-window mode.
-        if (context.supportedOrientations()
-                .contains(SupportedOrientation.Landscape) && !context.isInMultiWindowMode
+        if (activity.supportedOrientations()
+                .contains(SupportedOrientation.Landscape) && !activity.isInMultiWindowMode
         ) {
-            context.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+            activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
         }
 
         windowInsetsController.hide(WindowInsetsCompat.Type.systemBars().and(controllableInsetsTypeMask))
         windowInsetsController.systemBarsBehavior =
             WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-    }
-
-    DisposableEffect(isShowingControls, playerState.isPlaying) {
-        val coroutine = coroutineScope.launch {
-            if (isShowingControls) {
-                delay(5000)
-                isShowingControls = false
-            }
-        }
 
         onDispose {
-            coroutine.cancel()
-        }
-    }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            mediaSession.release()
-            player.release()
-            player.clearMediaItems()
-
             // Reset the requested orientation to the default
-            context.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+            activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
 
             windowInsetsController.show(WindowInsetsCompat.Type.systemBars())
             windowInsetsController.systemBarsBehavior =
@@ -183,12 +109,11 @@ fun PlayerScreen(
         }
     }
 
-    LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) {
-        player.pause()
+    LifecycleEventEffect(Lifecycle.Event.ON_START) {
+        viewModel.play()
     }
-
-    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-        player.play()
+    LifecycleEventEffect(Lifecycle.Event.ON_STOP) {
+        viewModel.pause()
     }
 
     // When the system bars can be hidden, ignore them when applying padding to the player and
@@ -207,21 +132,22 @@ fun PlayerScreen(
             .fillMaxSize()
             .windowInsetsPadding(windowInsetsForPadding)
     ) {
-        PlayerView(
-            player,
-            modifier = Modifier
-                .fillMaxSize()
-                .clickable { isShowingControls = !isShowingControls }
-        )
+        player?.let {
+            PlayerView(
+                it,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable { if (playerUiState.isShowingControls) viewModel.hideControls() else viewModel.showControls() }
+            )
 
-        PlayerControls(
-            modifier = Modifier
-                .fillMaxSize(),
-            visible = isShowingControls,
-            playerState = playerState,
-            onClose = onClose,
-            onPlayPause = { if (playerState.isPlaying) player.pause() else player.play() },
-            onSeek = { player.seekTo(it) }
-        )
+            PlayerControls(
+                modifier = Modifier
+                    .fillMaxSize(),
+                uiState = playerUiState,
+                onClose = onClose,
+                onPlayPause = { if (playerUiState.isPlaying) viewModel.pause() else viewModel.play() },
+                onSeek = viewModel::seekTo
+            )
+        }
     }
 }

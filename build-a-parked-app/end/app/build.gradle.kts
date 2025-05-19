@@ -17,16 +17,17 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    alias(libs.plugins.kotlinCompose)
 }
 
 android {
     namespace = "com.example.android.cars.roadreels"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.android.cars.roadreels"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -43,22 +44,6 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-        }
-    }
-
-    flavorDimensions += "formFactor"
-    productFlavors {
-        create("mobile") {
-            // Inform Android Studio to use this flavor as the default (e.g. in the Build Variants tool window)
-            isDefault = true
-            // Since there is only one flavor dimension, this is optional
-            dimension = "formFactor"
-        }
-        create("automotive") {
-            // Since there is only one flavor dimension, this is optional
-            dimension = "formFactor"
-            // Adding a suffix makes it easier to differentiate builds (e.g. in the Play Console)
-            versionNameSuffix = "-automotive"
         }
     }
 
@@ -81,6 +66,7 @@ android {
         }
     }
 
+    useLibrary("android.car")
 }
 
 dependencies {
