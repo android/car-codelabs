@@ -59,7 +59,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Column {
+                    Column(modifier = Modifier.windowInsetsPadding(WindowInsets.safeDrawing)) {
                         Text(
                             text = "Places",
                             style = MaterialTheme.typography.displayLarge,
