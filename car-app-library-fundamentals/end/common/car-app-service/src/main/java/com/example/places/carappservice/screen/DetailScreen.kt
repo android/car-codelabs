@@ -16,11 +16,9 @@
 
 package com.example.places.carappservice.screen
 
-import android.graphics.Color
 import androidx.car.app.CarContext
 import androidx.car.app.Screen
 import androidx.car.app.model.Action
-import androidx.car.app.model.CarColor
 import androidx.car.app.model.CarIcon
 import androidx.car.app.model.Header
 import androidx.car.app.model.MessageTemplate
@@ -34,7 +32,7 @@ import com.example.places.data.PlacesRepository
 import com.example.places.data.model.toIntent
 
 class DetailScreen(carContext: CarContext, private val placeId: Int) : Screen(carContext) {
-    private var isFavorite = false
+    private var isBookmarked = false
 
     override fun onGetTemplate(): Template {
         val place = PlacesRepository().getPlace(placeId)
@@ -62,21 +60,16 @@ class DetailScreen(carContext: CarContext, private val placeId: Int) : Screen(ca
             .setOnClickListener { carContext.startCarApp(place.toIntent(CarContext.ACTION_NAVIGATE)) }
             .build()
 
-        val favoriteAction = Action.Builder()
+        val bookmarkAction = Action.Builder()
             .setIcon(
                 CarIcon.Builder(
                     IconCompat.createWithResource(
                         carContext,
-                        R.drawable.baseline_favorite_24
-                    )
-                ).setTint(
-                    if (isFavorite) CarColor.RED else CarColor.createCustom(
-                        Color.LTGRAY,
-                        Color.DKGRAY
+                        if (isBookmarked) R.drawable.outline_bookmark_added_24 else R.drawable.outline_bookmark_add_24
                     )
                 ).build()
             ).setOnClickListener {
-                isFavorite = !isFavorite
+                isBookmarked = !isBookmarked
                 // Request that `onGetTemplate` be called again so that updates to the
                 // screen's state can be picked up
                 invalidate()
@@ -100,7 +93,7 @@ class DetailScreen(carContext: CarContext, private val placeId: Int) : Screen(ca
             Header.Builder()
                 .setStartHeaderAction(Action.BACK)
                 .setTitle(place.name)
-                .addEndHeaderAction(favoriteAction)
+                .addEndHeaderAction(bookmarkAction)
                 .build()
         ).build()
     }
