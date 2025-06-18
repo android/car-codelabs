@@ -1,5 +1,5 @@
 # Workflow name
-name: Build Car App Library Fundamentals - Start (App)
+name: Build Build a Parked App - Start (App)
 
 on:
   workflow_dispatch:
@@ -26,8 +26,8 @@ jobs:
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
-        working-directory: ./car-app-library-fundamentals/start
+        working-directory: ./build-a-parked-app/start
 
       - name: Build app
-        working-directory: ./car-app-library-fundamentals/start
+        working-directory: ./build-a-parked-app/start
         run: ./gradlew :app:assembleDebug

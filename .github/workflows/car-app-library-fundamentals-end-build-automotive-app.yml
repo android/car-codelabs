@@ -26,8 +26,8 @@ jobs:
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
-        working-directory: ./car-codelabs/car-app-library-fundamentals/end
+        working-directory: ./car-app-library-fundamentals/end
 
       - name: Build automotive app
-        working-directory: ./car-codelabs/car-app-library-fundamentals/end
+        working-directory: ./car-app-library-fundamentals/end
         run: ./gradlew :automotive:assembleDebug
