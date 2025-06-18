@@ -20,6 +20,7 @@ import android.content.Intent
 import androidx.car.app.CarAppService
 import androidx.car.app.Screen
 import androidx.car.app.Session
+import androidx.car.app.SessionInfo
 import androidx.car.app.validation.HostValidator
 import com.example.places.carappservice.screen.MainScreen
 
@@ -29,7 +30,7 @@ class PlacesCarAppService : CarAppService() {
         return HostValidator.ALLOW_ALL_HOSTS_VALIDATOR
     }
 
-    override fun onCreateSession(): Session {
+    override fun onCreateSession(sessionInfo: SessionInfo): Session {
         return PlacesSession()
     }
 }

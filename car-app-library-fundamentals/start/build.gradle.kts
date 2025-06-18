@@ -14,17 +14,10 @@
  * limitations under the License.
  */
 
-buildscript {
-    ext {
-        compose_bom = '2023.04.01'
-        // All versions can be found at https://developer.android.com/jetpack/androidx/releases/car-app
-        car_app_library_version = '1.3.0-rc01'
-    }
-}
-
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
-    id 'com.android.application' version '7.4.2' apply false
-    id 'com.android.library' version '7.4.2' apply false
-    id 'org.jetbrains.kotlin.android' version '1.8.10' apply false
+    alias(libs.plugins.androidApplication) apply false
+    alias(libs.plugins.androidLibrary) apply false
+    alias(libs.plugins.jetbrainsKotlinAndroid) apply false
+    alias(libs.plugins.kotlinCompose) apply false
 }

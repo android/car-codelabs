@@ -29,5 +29,7 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "Places"
-include ':app'
-include ':common:data'
+include(":app")
+include(":automotive")
+include(":common:data")
+include(":common:car-app-service")
