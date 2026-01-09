@@ -35,7 +35,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 val MEDIA_SOURCE =
-    MediaItem.fromUri("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")
+    MediaItem.fromUri("https://storage.googleapis.com/androiddevelopers/samples_assets/gtv-videos-bucket/sample/BigBuckBunny.mp4")
         .buildUpon().setMediaMetadata(
             MediaMetadata.Builder()
                 .setTitle("Big Buck Bunny")
