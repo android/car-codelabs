@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.twotone.Close
 import androidx.compose.material.icons.twotone.PauseCircle
 import androidx.compose.material.icons.twotone.PlayCircle
 import androidx.compose.material3.Icon
@@ -51,6 +52,7 @@ import com.example.android.cars.roadreels.R
 @Composable
 fun PlayerControls(
     uiState: PlayerUiState,
+    onClose: () -> Unit,
     onPlayPause: () -> Unit,
     onSeek: (seekToMillis: Long) -> Unit,
     modifier: Modifier = Modifier
@@ -66,7 +68,8 @@ fun PlayerControls(
                     .fillMaxWidth()
                     .padding(dimensionResource(R.dimen.screen_edge_padding))
                     .align(Alignment.TopCenter),
-                title = uiState.mediaMetadata.title?.toString()
+                title = uiState.mediaMetadata.title?.toString(),
+                onClose = onClose
             )
 
             CenterControls(
@@ -91,8 +94,19 @@ fun PlayerControls(
 
 
 @Composable
-fun TopControls(title: String?, modifier: Modifier = Modifier) {
+fun TopControls(title: String?, onClose: () -> Unit, modifier: Modifier = Modifier) {
     Box(modifier) {
+        IconButton(
+            modifier = Modifier
+                .align(Alignment.TopStart),
+            onClick = onClose
+        ) {
+            Icon(
+                Icons.TwoTone.Close,
+                contentDescription = "Close player",
+                tint = Color.White
+            )
+        }
         if (title != null) {
             Text(
                 title,

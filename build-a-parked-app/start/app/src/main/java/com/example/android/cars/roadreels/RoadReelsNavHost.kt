@@ -16,11 +16,13 @@
 
 package com.example.android.cars.roadreels
 
+import androidx.annotation.OptIn
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.runtime.Composable
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -32,6 +34,7 @@ import com.example.android.cars.roadreels.ui.screen.MainScreen
 import com.example.android.cars.roadreels.ui.screen.Screen
 import com.example.android.cars.roadreels.ui.screen.player.PlayerScreen
 
+@OptIn(UnstableApi::class)
 @Composable
 fun RoadReelsNavHost(
     windowSizeClass: WindowSizeClass,
@@ -63,7 +66,7 @@ fun RoadReelsNavHost(
             enterTransition = { EnterTransition.None  },
             exitTransition = { ExitTransition.None }
         ) {
-            PlayerScreen()
+            PlayerScreen(onClose = { navController.popBackStack() })
         }
     }
 }

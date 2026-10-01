@@ -56,6 +56,7 @@ data class PlayerUiState(
 @UnstableApi
 @Composable
 fun PlayerScreen(
+    onClose: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PlayerViewModel = viewModel()
 ) {
@@ -78,6 +79,7 @@ fun PlayerScreen(
 
         onDispose {
             // Reset the requested orientation to the default
+            activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED            // Reset the requested orientation to the default
             activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
 
             windowInsetsController.show(WindowInsetsCompat.Type.systemBars())
@@ -102,6 +104,7 @@ fun PlayerScreen(
                 modifier = Modifier
                     .fillMaxSize(),
                 uiState = playerUiState,
+                onClose = onClose,
                 onPlayPause = { if (playerUiState.isPlaying) viewModel.pause() else viewModel.play() },
                 onSeek = viewModel::seekTo
             )
